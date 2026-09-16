@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nb2pdf — Neobrutalism Jupyter Notebook to PDF Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&family=Space+Grotesk:wght@700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Top App Navigation -->
+    <header class="app-header">
+        <div class="header-brand">
+            <span class="brand-badge">⚡ IPYNB ➔ PDF</span>
+            <h1 class="brand-title">nb2pdf <span class="tag-neo">NEOBRUTALISM</span></h1>
+        </div>
+        <div class="header-actions">
+            <a href="https://github.com/ArdhanFah" target="_blank" rel="noopener noreferrer" class="btn-neo btn-github">
+                🐙 github.com/ArdhanFah
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workspace Layout -->
+    <main class="app-workspace">
+
+        <!-- Left Controls Sidebar -->
+        <aside class="sidebar-panel">
+
+            <!-- Upload Card -->
+            <div class="neo-card card-yellow">
+                <div class="card-header">
+                    <h2>📁 1. Upload Notebook</h2>
+                </div>
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-icon">📑</div>
+                    <p class="drop-text">Drag & drop your <strong>.ipynb</strong> file here</p>
+                    <span class="drop-sub">or click to browse files</span>
+                    <input type="file" id="fileInput" accept=".ipynb" style="display: none;">
+                </div>
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <span class="file-name" id="fileName">notebook.ipynb</span>
+                    <button class="btn-mini-danger" id="removeFileBtn">✕</button>
+                </div>
+                <div class="demo-actions">
+                    <button class="btn-neo btn-cyan btn-full" id="loadDemoBtn">⚡ Load Demo Notebook</button>
+                </div>
+            </div>
+
+            <!-- Identity Cover Settings Card -->
+            <div class="neo-card card-cyan">
+                <div class="card-header">
+                    <h2>👤 2. Cover / Identity Details</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label for="docTitle">Judul Laporan / Notebook</label>
+                    <input type="text" id="docTitle" class="neo-input" value="Laporan Praktikum" placeholder="Judul Laporan">
+                </div>
+
+                <div class="form-group">
+                    <label for="studentName">Nama Lengkap</label>
+                    <input type="text" id="studentName" class="neo-input" value="Ardhan Dikri Achmad Fahrudin" placeholder="Nama Lengkap">
+                </div>
+
+                <div class="form-group">
+                    <label for="studentNim">NIM (Nomor Induk)</label>
+                    <input type="text" id="studentNim" class="neo-input" value="2441070020012" placeholder="NIM">
+                </div>
+
+                <div class="form-group">
+                    <label for="studentClass">Kelas</label>
+                    <input type="text" id="studentClass" class="neo-input" value="TI-3B" placeholder="Kelas">
+                </div>
+
+                <div class="save-action">
+                    <button class="btn-neo btn-mint btn-full" id="saveIdentityBtn">💾 SIMPAN IDENTITAS</button>
+                    <div class="save-status" id="saveStatus"></div>
+                </div>
+            </div>
+
+            <!-- Export Action Card -->
+            <div class="neo-card card-pink">
+                <div class="card-header">
+                    <h2>🚀 3. Export Output</h2>
+                </div>
+                <button class="btn-neo btn-primary btn-full btn-lg" id="exportPdfBtn" disabled>
+                    📄 GENERATE PDF WITH COVER
+                </button>
+                <div class="status-msg" id="statusMsg"></div>
+            </div>
+
+        </aside>
+
+        <!-- Right Live Preview Canvas -->
+        <section class="preview-panel">
+            <div class="preview-bar">
+                <div class="bar-title">LIVE COVER & NOTEBOOK PREVIEW</div>
+                <div class="bar-dots">
+                    <span class="dot dot-red"></span>
+                    <span class="dot dot-yellow"></span>
+                    <span class="dot dot-green"></span>
+                </div>
+            </div>
+
+            <!-- Preview Frame / Container -->
+            <div class="preview-canvas" id="previewCanvas">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">🎓</div>
+                    <h3>No Notebook Loaded Yet</h3>
+                    <p>Fill in your <strong>Judul, Nama, NIM, and Kelas</strong> on the left and upload a <code>.ipynb</code> file or click <strong>Load Demo Notebook</strong> to preview your PDF cover.</p>
+                </div>
+                <iframe id="previewIframe" class="preview-iframe" style="display: none;"></iframe>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Permanent Footer -->
+    <footer class="app-footer">
+        <a href="https://github.com/ArdhanFah" target="_blank" rel="noopener noreferrer" class="footer-badge" id="footerLinkBadge">
+            © Code ini dibuat oleh <strong>ArdhanFah</strong> — https://github.com/ArdhanFah
+        </a>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
