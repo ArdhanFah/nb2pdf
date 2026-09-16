@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ notebook_title | default("Jupyter Notebook") }}</title>
+    <style>
+        {{ css_content }}
+    </style>
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+<body>
+
+    <!-- Cover Header / Metadata Block -->
+    <div class="cover-container">
+        <div class="cover-title">{{ notebook_title | default("Jupyter Notebook") }}</div>
+        <div class="cover-meta-table">
+            <div class="meta-row">
+                <div class="meta-label">Nama</div>
+                <div class="meta-colon">:</div>
+                <div class="meta-value">{{ student_name if (student_name and student_name.strip() and student_name != "-") else "Ardhan Dikri Achmad Fahrudin" }}</div>
+            </div>
+            <div class="meta-row">
+                <div class="meta-label">NIM</div>
+                <div class="meta-colon">:</div>
+                <div class="meta-value">{{ student_nim if (student_nim and student_nim.strip() and student_nim != "-") else "2441070020012" }}</div>
+            </div>
+            <div class="meta-row">
+                <div class="meta-label">Kelas</div>
+                <div class="meta-colon">:</div>
+                <div class="meta-value">{{ student_class if (student_class and student_class.strip() and student_class != "-") else "TI-3B" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notebook Container -->
+    <div class="notebook-container">
+        {% for cell in cells %}
+            {% if cell.cell_type == 'markdown' %}
+                <div class="cell markdown-cell">
+                    {{ cell.rendered_html }}
+                </div>
+            {% elif cell.cell_type == 'code' %}
+                <div class="cell code-cell">
+                    <div class="code-cell-header">
+                        <span>[CODE CELL #{{ loop.index }}]</span>
+                        <span>PYTHON</span>
+                    </div>
+                    <div class="code-cell-input"><pre><code>{{ cell.source }}</code></pre></div>
+                    {% if cell.outputs %}
+                        <div class="code-cell-output">
+                            {% for output in cell.outputs %}
+                                {% if output.output_type == 'stream' %}
+                                    <div class="output-{{ output.name }}"><pre>{{ output.text }}</pre></div>
+                                {% elif output.output_type in ['execute_result', 'display_data'] %}
+                                    {% if 'image/png' in output.data %}
+                                        <div class="output-display-data">
+                                            <img src="data:image/png;base64,{{ output.data['image/png'] }}" alt="Output Plot">
+                                        </div>
+                                    {% elif 'image/jpeg' in output.data %}
+                                        <div class="output-display-data">
+                                            <img src="data:image/jpeg;base64,{{ output.data['image/jpeg'] }}" alt="Output Image">
+                                        </div>
+                                    {% elif 'text/html' in output.data %}
+                                        <div class="output-html">
+                                            {{ output.data['text/html'] }}
+                                        </div>
+                                    {% elif 'text/plain' in output.data %}
+                                        <div class="output-stdout"><pre>{{ output.data['text/plain'] }}</pre></div>
+                                    {% endif %}
+                                {% elif output.output_type == 'error' %}
+                                    <div class="output-stderr">
+                                        <pre>{{ output.ename }}: {{ output.evalue }}</pre>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Clean Footer with top divider line -->
+    <div class="footer-container">
+        <a href="{{ footer_url | default('https://github.com/ArdhanFah') }}" class="footer-link-badge" target="_blank" rel="noopener noreferrer">
+            © Code ini dibuat oleh <strong>{{ footer_text | default('ArdhanFah') }}</strong> — <span>{{ footer_url | default('https://github.com/ArdhanFah') }}</span>
+        </a>
+    </div>
+
+</body>
+</html>
