@@ -80,6 +80,7 @@ class NeobrutalismRequestHandler(BaseHTTPRequestHandler):
         student_name = payload.get("student_name", "").strip()
         student_nim = payload.get("student_nim", "").strip()
         student_class = payload.get("student_class", "").strip()
+        show_cover = payload.get("show_cover", True)
 
         try:
             nb = nbformat.reads(ipynb_str, as_version=4)
@@ -118,7 +119,8 @@ class NeobrutalismRequestHandler(BaseHTTPRequestHandler):
             footer_url=footer_url,
             student_name=student_name,
             student_nim=student_nim,
-            student_class=student_class
+            student_class=student_class,
+            show_cover=show_cover
         )
 
         self._send_response(rendered_html, "text/html")
@@ -133,6 +135,7 @@ class NeobrutalismRequestHandler(BaseHTTPRequestHandler):
         student_name = payload.get("student_name", "").strip()
         student_nim = payload.get("student_nim", "").strip()
         student_class = payload.get("student_class", "").strip()
+        show_cover = payload.get("show_cover", True)
 
         if not title or title.lower().startswith("tmp"):
             if filename and not filename.lower().startswith("tmp"):
@@ -156,7 +159,8 @@ class NeobrutalismRequestHandler(BaseHTTPRequestHandler):
                 footer_url=footer_url,
                 student_name=student_name,
                 student_nim=student_nim,
-                student_class=student_class
+                student_class=student_class,
+                show_cover=show_cover
             )
 
             with open(tmp_out_path, "rb") as f:
@@ -189,9 +193,13 @@ class NeobrutalismRequestHandler(BaseHTTPRequestHandler):
                     pass
 
 
+class ReusableHTTPServer(HTTPServer):
+    allow_reuse_address = True
+
+
 def run_server(port=5000):
     server_address = ("", port)
-    httpd = HTTPServer(server_address, NeobrutalismRequestHandler)
+    httpd = ReusableHTTPServer(server_address, NeobrutalismRequestHandler)
     print(f"⚡ nb2pdf Web Application running at http://localhost:{port}")
     httpd.serve_forever()
 

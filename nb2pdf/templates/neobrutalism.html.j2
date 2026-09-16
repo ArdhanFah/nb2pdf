@@ -24,6 +24,7 @@
 <body>
 
     <!-- Cover Header / Metadata Block -->
+    {% if show_cover is not defined or show_cover %}
     <div class="cover-container">
         <div class="cover-title">{{ notebook_title | default("Jupyter Notebook") }}</div>
         <div class="cover-meta-table">
@@ -44,6 +45,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- Notebook Container -->
     <div class="notebook-container">
@@ -93,10 +95,13 @@
         {% endfor %}
     </div>
 
-    <!-- Clean Footer with top divider line -->
+    <!-- Clean Footer -->
     <div class="footer-container">
-        <a href="{{ footer_url | default('https://github.com/ArdhanFah') }}" class="footer-link-badge" target="_blank" rel="noopener noreferrer">
-            © Code ini dibuat oleh <strong>{{ footer_text | default('ArdhanFah') }}</strong> — <span>{{ footer_url | default('https://github.com/ArdhanFah') }}</span>
+        <div class="footer-text-block">
+            © 2026 <strong>nb2pdf</strong> • Created by <strong>ArdhanFah</strong>
+        </div>
+        <a href="https://github.com/ArdhanFah" class="footer-link-badge" target="_blank" rel="noopener noreferrer">
+            🐙 github.com/ArdhanFah
         </a>
     </div>
 

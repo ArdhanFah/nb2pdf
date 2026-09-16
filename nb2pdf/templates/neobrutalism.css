@@ -279,31 +279,37 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Clean Footer with Dividing Line for PDF */
+/* Clean Footer for PDF & Web */
 .footer-container {
     position: fixed;
     bottom: -15mm;
     left: 0;
     right: 0;
-    height: 12mm;
+    height: 14mm;
     text-align: center;
     border-top: 1.5px solid #BDC1C6;
-    padding-top: 8px;
+    padding-top: 6px;
     background-color: #FFFFFF;
-    z-index: 9999;
+}
+
+.footer-text-block {
+    font-family: 'Google Sans', 'Roboto', sans-serif;
+    font-size: 9pt;
+    color: #5F6368;
+    margin-bottom: 2px;
+}
+
+.footer-text-block strong {
+    color: #202124;
+    font-weight: 700;
 }
 
 .footer-link-badge {
     display: inline-block;
-    color: #5F6368 !important;
+    color: #1A73E8 !important;
     text-decoration: none !important;
     font-family: 'Google Sans', 'Roboto', sans-serif;
-    font-weight: 500;
-    font-size: 9pt;
-    letter-spacing: 0.2px;
-}
-
-.footer-link-badge strong, .footer-link-badge span {
-    color: #202124;
     font-weight: 700;
+    font-size: 8.5pt;
+    letter-spacing: 0.2px;
 }

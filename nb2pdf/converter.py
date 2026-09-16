@@ -415,10 +415,11 @@ def convert(
     footer_url: str = "https://github.com/ArdhanFah",
     student_name: str = None,
     student_nim: str = None,
-    student_class: str = None
+    student_class: str = None,
+    show_cover: bool = True
 ) -> str:
     """
-    Convert a Jupyter Notebook (.ipynb) to a clean PDF with MathML equations and cover header.
+    Convert a Jupyter Notebook (.ipynb) to a clean PDF with MathML equations and optional cover header.
     """
     ipynb_path = Path(ipynb_path).resolve()
     if not ipynb_path.exists():
@@ -472,7 +473,8 @@ def convert(
         footer_url=footer_url,
         student_name=student_name,
         student_nim=student_nim,
-        student_class=student_class
+        student_class=student_class,
+        show_cover=show_cover
     )
 
     # Convert HTML to PDF using WeasyPrint
