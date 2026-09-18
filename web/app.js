@@ -537,6 +537,11 @@ document.addEventListener('DOMContentLoaded', () => {
 </html>`;
     }
 
+    // Backend API base URL
+    const BACKEND_URL = window.location.hostname.includes('github.io') || window.location.hostname.includes('ardhanfah.my.id') 
+        ? 'https://nb2pdf-hazel.vercel.app' 
+        : '';
+
     // Fetch Live Preview
     async function fetchPreview() {
         if (!currentFileContent) return;
@@ -548,7 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let htmlContent = null;
 
             try {
-                const res = await fetch('/api/preview', {
+                const res = await fetch(`${BACKEND_URL}/api/preview`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -601,7 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 let pdfBlob = null;
                 try {
-                    const res = await fetch('/api/convert', {
+                    const res = await fetch(`${BACKEND_URL}/api/convert`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
