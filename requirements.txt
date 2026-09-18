@@ -1,0 +1,6 @@
+nbconvert
+nbformat
+weasyprint
+jinja2
+pygments
+markdown
