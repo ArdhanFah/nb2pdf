@@ -272,6 +272,35 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // Helper to autolink URLs in text
+    function autolinkText(text) {
+        if (!text) return '';
+        const urlRegex = /(https?:\/\/[^\s<>"'\)]+)/g;
+        return text.replace(urlRegex, (url) => {
+            let cleanUrl = url;
+            let trailing = '';
+            while (cleanUrl && '.,;:]!)'.includes(cleanUrl[cleanUrl.length - 1])) {
+                trailing = cleanUrl[cleanUrl.length - 1] + trailing;
+                cleanUrl = cleanUrl.slice(0, -1);
+            }
+            return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${cleanUrl}</a>${trailing}`;
+        });
+    }
+
+    // Helper to replace identity placeholders inside cell text
+    function processIdentityPlaceholders(text, name, nim, sClass) {
+        if (!text) return text;
+        const nameVal = name || "Ardhan Dikri Achmad Fahrudin";
+        const nimVal = nim || "2441070020012";
+        const classVal = sClass || "TI-3B";
+
+        let t = text;
+        t = t.replace(/(\b\*{0,2}Nama\*{0,2}\s*[:\t]\s*)[-–—]+/gi, '$1' + nameVal);
+        t = t.replace(/(\b\*{0,2}NIM\*{0,2}\s*[:\t]\s*)[-–—]+/gi, '$1' + nimVal);
+        t = t.replace(/(\b\*{0,2}Kelas\*{0,2}\s*[:\t]\s*)[-–—]+/gi, '$1' + classVal);
+        return t;
+    }
+
     // Simple Client-Side HTML Renderer for static GitHub Pages fallback
     function renderStaticPreviewHtml(payload) {
         let nb = {};
@@ -289,8 +318,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let cellsHtml = '';
         (nb.cells || []).forEach((cell, idx) => {
-            const srcArr = Array.isArray(cell.source) ? cell.source : [cell.source || ''];
-            const srcText = srcArr.join('');
+            let srcArr = Array.isArray(cell.source) ? cell.source : [cell.source || ''];
+            let srcText = srcArr.join('');
+
+            srcText = processIdentityPlaceholders(srcText, name, nim, sClass);
 
             if (cell.cell_type === 'markdown') {
                 let mdContent = srcText
@@ -304,6 +335,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 mdContent = mdContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 mdContent = mdContent.replace(/\*(.*?)\*/g, '<em>$1</em>');
                 mdContent = mdContent.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+                
+                // Autolink raw URLs
+                mdContent = autolinkText(mdContent);
                 mdContent = mdContent.replace(/\n\n/g, '<br><br>');
 
                 cellsHtml += `<div class="cell markdown-cell">${mdContent}</div>`;
@@ -317,14 +351,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 (cell.outputs || []).forEach(out => {
                     if (out.output_type === 'stream' || out.text) {
                         const txt = Array.isArray(out.text) ? out.text.join('') : (out.text || '');
-                        outputsHtml += `<div class="output-stdout"><pre>${txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></div>`;
+                        const escapedTxt = txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        outputsHtml += `<div class="output-stdout"><pre>${autolinkText(escapedTxt)}</pre></div>`;
                     } else if (out.data && out.data['image/png']) {
                         outputsHtml += `<div class="output-display-data"><img src="data:image/png;base64,${out.data['image/png']}"></div>`;
                     } else if (out.data && out.data['image/jpeg']) {
                         outputsHtml += `<div class="output-display-data"><img src="data:image/jpeg;base64,${out.data['image/jpeg']}"></div>`;
                     } else if (out.data && out.data['text/plain']) {
                         const txt = Array.isArray(out.data['text/plain']) ? out.data['text/plain'].join('') : out.data['text/plain'];
-                        outputsHtml += `<div class="output-stdout"><pre>${txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></div>`;
+                        const escapedTxt = txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        outputsHtml += `<div class="output-stdout"><pre>${autolinkText(escapedTxt)}</pre></div>`;
                     }
                 });
 
