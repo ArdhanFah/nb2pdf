@@ -320,6 +320,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         outputsHtml += `<div class="output-stdout"><pre>${txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></div>`;
                     } else if (out.data && out.data['image/png']) {
                         outputsHtml += `<div class="output-display-data"><img src="data:image/png;base64,${out.data['image/png']}"></div>`;
+                    } else if (out.data && out.data['image/jpeg']) {
+                        outputsHtml += `<div class="output-display-data"><img src="data:image/jpeg;base64,${out.data['image/jpeg']}"></div>`;
+                    } else if (out.data && out.data['text/plain']) {
+                        const txt = Array.isArray(out.data['text/plain']) ? out.data['text/plain'].join('') : out.data['text/plain'];
+                        outputsHtml += `<div class="output-stdout"><pre>${txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></div>`;
                     }
                 });
 
@@ -341,9 +346,9 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="cover-container">
             <div class="cover-title">${title}</div>
             <div class="cover-meta-table">
-                <div class="meta-row"><span class="meta-label">Nama</span><span class="meta-colon">:</span><span class="meta-value">${name}</span></div>
-                <div class="meta-row"><span class="meta-label">NIM</span><span class="meta-colon">:</span><span class="meta-value">${nim}</span></div>
-                <div class="meta-row"><span class="meta-label">Kelas</span><span class="meta-colon">:</span><span class="meta-value">${sClass}</span></div>
+                <div class="meta-row"><div class="meta-label">Nama</div><div class="meta-colon">:</div><div class="meta-value">${name}</div></div>
+                <div class="meta-row"><div class="meta-label">NIM</div><div class="meta-colon">:</div><div class="meta-value">${nim}</div></div>
+                <div class="meta-row"><div class="meta-label">Kelas</div><div class="meta-colon">:</div><div class="meta-value">${sClass}</div></div>
             </div>
         </div>` : '';
 
@@ -363,16 +368,23 @@ document.addEventListener('DOMContentLoaded', () => {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
+        displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']]
+      }
+    };
+    </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         @page {
             size: A4;
-            margin: 15mm;
+            margin: 18mm 15mm 24mm 15mm;
         }
         * { box-sizing: border-box; }
         body {
-            font-family: 'Google Sans', 'Roboto', sans-serif;
+            font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             background-color: #FFFFFF;
             color: #202124;
             line-height: 1.6;
@@ -387,6 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
             padding: 18px 24px;
             margin-bottom: 24px;
             page-break-inside: avoid;
+            break-inside: avoid;
         }
         .cover-title {
             font-size: 18pt;
@@ -396,17 +409,22 @@ document.addEventListener('DOMContentLoaded', () => {
             border-bottom: 2px solid #202124;
             padding-bottom: 6px;
             text-transform: uppercase;
+            letter-spacing: -0.3px;
         }
         .cover-meta-table { display: table; width: 100%; margin-top: 8px; }
         .meta-row { display: table-row; line-height: 1.8; }
-        .meta-label { display: table-cell; font-weight: 700; color: #5F6368; width: 80px; font-size: 10pt; text-transform: uppercase; }
+        .meta-label { display: table-cell; font-weight: 700; color: #5F6368; width: 70px; font-size: 10pt; text-transform: uppercase; }
         .meta-colon { display: table-cell; font-weight: 700; color: #5F6368; width: 15px; text-align: center; }
         .meta-value { display: table-cell; font-weight: 500; color: #202124; font-size: 10.5pt; }
-        .cell { margin-bottom: 16px; }
-        .markdown-cell { background-color: #FFFFFF; color: #202124; }
-        .markdown-cell h1 { font-size: 16pt; border-bottom: 1px solid #DADCE0; padding-bottom: 4px; margin-top: 14px; margin-bottom: 8px; }
-        .markdown-cell h2 { font-size: 13pt; margin-top: 14px; margin-bottom: 8px; }
-        .markdown-cell h3 { font-size: 11.5pt; margin-top: 14px; margin-bottom: 8px; }
+        .notebook-container { width: 100%; }
+        .cell { margin-bottom: 16px; page-break-inside: auto; break-inside: auto; }
+        .markdown-cell { background-color: #FFFFFF; padding: 6px 0; color: #202124; page-break-inside: auto; break-inside: auto; }
+        .markdown-cell h1, .markdown-cell h2, .markdown-cell h3, .markdown-cell h4 { color: #202124; font-weight: 700; margin-top: 14px; margin-bottom: 8px; page-break-after: avoid; break-after: avoid; }
+        .markdown-cell h1 { font-size: 16pt; border-bottom: 1px solid #DADCE0; padding-bottom: 4px; }
+        .markdown-cell h2 { font-size: 13pt; }
+        .markdown-cell h3 { font-size: 11.5pt; }
+        .markdown-cell p { margin-bottom: 8px; }
+        .markdown-cell ul, .markdown-cell ol { padding-left: 20px; margin-bottom: 8px; }
         .code-cell {
             border: 1px solid #DADCE0;
             border-radius: 6px;
@@ -414,35 +432,47 @@ document.addEventListener('DOMContentLoaded', () => {
             overflow: hidden;
             margin-bottom: 14px;
             page-break-inside: auto;
+            break-inside: auto;
         }
         .code-cell-header {
             background-color: #F1F3F4;
             color: #5F6368;
-            font-family: 'Fira Code', monospace;
+            font-family: 'Fira Code', 'Roboto Mono', monospace;
             font-size: 8.5pt;
             font-weight: 600;
             padding: 4px 12px;
             border-bottom: 1px solid #E8EAED;
+            display: flex;
+            justify-content: space-between;
+            page-break-after: avoid;
+            break-after: avoid;
         }
         .code-cell-input {
             padding: 10px 14px;
             background-color: #F8F9FA;
-            font-family: 'Fira Code', monospace;
+            color: #202124;
+            font-family: 'Fira Code', 'Courier New', monospace;
             font-size: 9pt;
             line-height: 1.5;
             white-space: pre-wrap;
             word-break: break-all;
+            page-break-inside: auto;
+            break-inside: auto;
         }
         .code-cell-input pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
         .code-cell-output {
             background-color: #FFFFFF;
             border-top: 1px solid #DADCE0;
             padding: 10px 14px;
-            font-family: 'Fira Code', monospace;
+            font-family: 'Fira Code', 'Courier New', monospace;
             font-size: 8.5pt;
+            color: #3C4043;
+            page-break-inside: auto;
+            break-inside: auto;
         }
+        .output-stdout, .output-stderr { white-space: pre-wrap; word-break: break-all; font-family: 'Fira Code', monospace; page-break-inside: auto; break-inside: auto; }
         .output-stdout pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
-        .output-display-data img { max-width: 100%; border: 1px solid #DADCE0; border-radius: 4px; margin-top: 8px; }
+        .output-display-data img { max-width: 100%; max-height: 220mm; height: auto; border: 1px solid #DADCE0; border-radius: 4px; margin-top: 8px; page-break-inside: avoid; break-inside: avoid; }
         .footer-container {
             margin-top: 36px;
             padding-top: 10px;
@@ -453,8 +483,11 @@ document.addEventListener('DOMContentLoaded', () => {
         .footer-link-badge { color: #1A73E8; font-weight: 700; text-decoration: none; font-size: 8.5pt; }
 
         @media print {
-            body { padding: 0; }
-            .footer-container { position: fixed; bottom: 0; left: 0; right: 0; }
+            body { padding: 0; margin: 0; }
+            .cover-container { border: 1px solid #DADCE0 !important; background-color: #F8F9FA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .code-cell { border: 1px solid #DADCE0 !important; background-color: #F8F9FA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .code-cell-header { background-color: #F1F3F4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .footer-container { position: fixed; bottom: 0; left: 0; right: 0; background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
@@ -553,31 +586,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.URL.revokeObjectURL(url);
                     showStatus('✅ PDF Downloaded Successfully!', 'green');
                 } else {
-                    // Pure Client-Side PDF Generation for GitHub Pages using html2pdf
-                    showStatus('⏳ Generating PDF directly in browser (Client-side)...');
-                    const iframeDoc = previewIframe.contentDocument || previewIframe.contentWindow.document;
-                    const element = iframeDoc.body;
-                    
-                    const fileName = (payload.title ? payload.title.replace(/[^a-z0-9]/gi, '_') : 'notebook') + '.pdf';
-                    
-                    const opt = {
-                        margin:       10,
-                        filename:     fileName,
-                        image:        { type: 'jpeg', quality: 0.98 },
-                        html2canvas:  { scale: 2, useCORS: true, logging: false },
-                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                    };
-
-                    if (window.html2pdf) {
-                        await window.html2pdf().set(opt).from(element).save();
-                        showStatus('✅ PDF Downloaded Successfully!', 'green');
-                    } else {
-                        // Fallback if script not loaded
-                        const win = previewIframe.contentWindow;
-                        if (win) {
-                            win.focus();
-                            win.print();
-                        }
+                    // Optimized High-Quality Native Browser Print PDF for GitHub Pages
+                    showStatus('ℹ️ Membuka dialog Cetak PDF browser...', 'green');
+                    const win = previewIframe.contentWindow;
+                    if (win) {
+                        win.focus();
+                        win.print();
                     }
                 }
             } catch (err) {
