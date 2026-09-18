@@ -520,9 +520,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         @media print {
             body { padding: 0; margin: 0; }
-            .cover-container { border: 1px solid #DADCE0 !important; background-color: #F8F9FA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .code-cell { border: 1px solid #DADCE0 !important; background-color: #F8F9FA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .code-cell-header { background-color: #F1F3F4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cover-container { border: 1px solid #DADCE0 !important; background-color: #F8F9FA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; page-break-inside: avoid !important; break-inside: avoid !important; }
+            .code-cell { border: 1px solid #DADCE0 !important; background-color: #F8F9FA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; page-break-inside: avoid !important; break-inside: avoid !important; }
+            .code-cell-header { background-color: #F1F3F4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; page-break-after: avoid !important; break-after: avoid !important; }
+            .markdown-cell h1, .markdown-cell h2, .markdown-cell h3, .markdown-cell h4 { page-break-after: avoid !important; break-after: avoid !important; }
+            .output-display-data img { page-break-inside: avoid !important; break-inside: avoid !important; }
             .footer-container { position: fixed; bottom: 0; left: 0; right: 0; background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
@@ -605,6 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 let pdfBlob = null;
+                let errorMsg = null;
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/convert`, {
                         method: 'POST',
@@ -613,8 +616,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     if (res.ok) {
                         pdfBlob = await res.blob();
+                    } else {
+                        errorMsg = await res.text();
                     }
-                } catch (_) {}
+                } catch (e) {
+                    errorMsg = e.message;
+                }
 
                 if (pdfBlob) {
                     const url = window.URL.createObjectURL(pdfBlob);
@@ -627,8 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.URL.revokeObjectURL(url);
                     showStatus('✅ PDF Downloaded Successfully!', 'green');
                 } else {
-                    // Optimized High-Quality Native Browser Print PDF for GitHub Pages
-                    showStatus('ℹ️ Membuka dialog Cetak PDF browser...', 'green');
+                    showStatus('⚠️ Backend error: ' + (errorMsg || 'Server failed') + '. Membuka dialog Cetak PDF browser...', 'red');
                     const win = previewIframe.contentWindow;
                     if (win) {
                         win.focus();
