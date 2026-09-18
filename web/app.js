@@ -521,10 +521,11 @@ document.addEventListener('DOMContentLoaded', () => {
         @media print {
             body { padding: 0; margin: 0; }
             .cover-container { border: 1px solid #DADCE0 !important; background-color: #F8F9FA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; page-break-inside: avoid !important; break-inside: avoid !important; }
-            .code-cell { border: 1px solid #DADCE0 !important; background-color: #F8F9FA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; page-break-inside: avoid !important; break-inside: avoid !important; }
+            .code-cell { border: 1px solid #DADCE0 !important; background-color: #F8F9FA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; page-break-inside: auto !important; break-inside: auto !important; }
             .code-cell-header { background-color: #F1F3F4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; page-break-after: avoid !important; break-after: avoid !important; }
+            .markdown-cell { page-break-inside: auto !important; break-inside: auto !important; }
             .markdown-cell h1, .markdown-cell h2, .markdown-cell h3, .markdown-cell h4 { page-break-after: avoid !important; break-after: avoid !important; }
-            .output-display-data img { page-break-inside: avoid !important; break-inside: avoid !important; }
+            .output-display-data img { max-width: 100% !important; page-break-inside: avoid !important; break-inside: avoid !important; }
             .footer-container { position: fixed; bottom: 0; left: 0; right: 0; background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
