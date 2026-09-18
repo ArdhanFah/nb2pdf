@@ -293,18 +293,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const srcText = srcArr.join('');
 
             if (cell.cell_type === 'markdown') {
-                // Escape simple HTML
                 let mdContent = srcText
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;');
                 
-                // Formats headers
                 mdContent = mdContent.replace(/^### (.*$)/gim, '<h3>$1</h3>');
                 mdContent = mdContent.replace(/^## (.*$)/gim, '<h2>$1</h2>');
                 mdContent = mdContent.replace(/^# (.*$)/gim, '<h1>$1</h1>');
                 mdContent = mdContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 mdContent = mdContent.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                mdContent = mdContent.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
                 mdContent = mdContent.replace(/\n\n/g, '<br><br>');
 
                 cellsHtml += `<div class="cell markdown-cell">${mdContent}</div>`;
@@ -318,61 +317,145 @@ document.addEventListener('DOMContentLoaded', () => {
                 (cell.outputs || []).forEach(out => {
                     if (out.output_type === 'stream' || out.text) {
                         const txt = Array.isArray(out.text) ? out.text.join('') : (out.text || '');
-                        outputsHtml += `<pre class="stream-output">${txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
+                        outputsHtml += `<div class="output-stdout"><pre>${txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></div>`;
                     } else if (out.data && out.data['image/png']) {
-                        outputsHtml += `<div class="image-output"><img src="data:image/png;base64,${out.data['image/png']}"></div>`;
+                        outputsHtml += `<div class="output-display-data"><img src="data:image/png;base64,${out.data['image/png']}"></div>`;
                     }
                 });
 
                 cellsHtml += `
                     <div class="cell code-cell">
-                        <div class="code-prompt">In [${cell.execution_count || ' '}]:</div>
-                        <pre class="code-input"><code>${codeEscaped}</code></pre>
-                        ${outputsHtml ? `<div class="code-outputs">${outputsHtml}</div>` : ''}
+                        <div class="code-cell-header">
+                            <span>In [${cell.execution_count || ' '}]:</span>
+                        </div>
+                        <div class="code-cell-input">
+                            <pre><code>${codeEscaped}</code></pre>
+                        </div>
+                        ${outputsHtml ? `<div class="code-cell-output">${outputsHtml}</div>` : ''}
                     </div>
                 `;
             }
         });
 
         const coverHtml = showCover ? `
-    <div class="cover-container">
-        <div class="cover-title">${title}</div>
-        <div class="meta-table">
-            <div class="meta-row"><span class="meta-label">NAMA</span><span class="meta-colon">:</span><span class="meta-value">${name}</span></div>
-            <div class="meta-row"><span class="meta-label">NIM</span><span class="meta-colon">:</span><span class="meta-value">${nim}</span></div>
-            <div class="meta-row"><span class="meta-label">KELAS</span><span class="meta-colon">:</span><span class="meta-value">${sClass}</span></div>
-        </div>
-    </div>` : '';
+        <div class="cover-container">
+            <div class="cover-title">${title}</div>
+            <div class="cover-meta-table">
+                <div class="meta-row"><span class="meta-label">Nama</span><span class="meta-colon">:</span><span class="meta-value">${name}</span></div>
+                <div class="meta-row"><span class="meta-label">NIM</span><span class="meta-colon">:</span><span class="meta-value">${nim}</span></div>
+                <div class="meta-row"><span class="meta-label">Kelas</span><span class="meta-colon">:</span><span class="meta-value">${sClass}</span></div>
+            </div>
+        </div>` : '';
 
         const footerHtml = `
-    <div style="margin-top: 36px; padding-top: 10px; border-top: 1.5px solid #BDC1C6; text-align: center; font-family: 'Google Sans', 'Roboto', sans-serif;">
-        <div style="font-size: 9pt; color: #5F6368; margin-bottom: 3px;">
-            © 2026 <strong style="color: #202124;">nb2pdf</strong> • Created by <strong style="color: #202124;">ArdhanFah</strong>
-        </div>
-        <a href="https://github.com/ArdhanFah" target="_blank" style="color: #1A73E8; font-weight: 700; text-decoration: none; font-size: 8.5pt;">🐙 github.com/ArdhanFah</a>
-    </div>`;
+        <div class="footer-container">
+            <div class="footer-text-block">
+                © 2026 <strong>nb2pdf</strong> • Created by <strong>ArdhanFah</strong>
+            </div>
+            <a href="https://github.com/ArdhanFah" target="_blank" class="footer-link-badge">🐙 github.com/ArdhanFah</a>
+        </div>`;
 
         return `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>${title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        body { font-family: 'Google Sans', 'Roboto', sans-serif; background: #fff; color: #202124; padding: 24px; margin: 0; line-height: 1.6; }
-        .cover-container { border: 1px solid #DADCE0; border-radius: 8px; background-color: #F8F9FA; padding: 18px 24px; margin-bottom: 24px; }
-        .cover-title { font-size: 18pt; font-weight: 700; border-bottom: 2px solid #202124; padding-bottom: 6px; margin-bottom: 12px; text-transform: uppercase; }
-        .meta-table { display: table; width: 100%; font-size: 10.5pt; }
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            background-color: #FFFFFF;
+            color: #202124;
+            line-height: 1.6;
+            font-size: 10.5pt;
+            margin: 0;
+            padding: 20px;
+        }
+        .cover-container {
+            border: 1px solid #DADCE0;
+            border-radius: 8px;
+            background-color: #F8F9FA;
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            page-break-inside: avoid;
+        }
+        .cover-title {
+            font-size: 18pt;
+            font-weight: 700;
+            color: #202124;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #202124;
+            padding-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .cover-meta-table { display: table; width: 100%; margin-top: 8px; }
         .meta-row { display: table-row; line-height: 1.8; }
-        .meta-label { display: table-cell; font-weight: 700; color: #5F6368; width: 70px; text-transform: uppercase; }
+        .meta-label { display: table-cell; font-weight: 700; color: #5F6368; width: 80px; font-size: 10pt; text-transform: uppercase; }
         .meta-colon { display: table-cell; font-weight: 700; color: #5F6368; width: 15px; text-align: center; }
-        .meta-value { display: table-cell; font-weight: 500; color: #202124; }
-        .cell { margin-bottom: 18px; }
-        .code-prompt { font-family: monospace; font-size: 9pt; color: #5F6368; font-weight: bold; margin-bottom: 4px; }
-        pre.code-input { background: #F1F3F4; border: 1px solid #DADCE0; border-radius: 6px; padding: 12px; font-family: 'Fira Code', monospace; font-size: 9.5pt; overflow-x: auto; margin: 0 0 8px 0; }
-        .stream-output { background: #FFFFFF; border-left: 3px solid #1A73E8; padding: 8px 12px; font-family: monospace; font-size: 9pt; margin: 4px 0; }
-        .image-output img { max-width: 100%; border-radius: 4px; margin-top: 8px; }
+        .meta-value { display: table-cell; font-weight: 500; color: #202124; font-size: 10.5pt; }
+        .cell { margin-bottom: 16px; }
+        .markdown-cell { background-color: #FFFFFF; color: #202124; }
+        .markdown-cell h1 { font-size: 16pt; border-bottom: 1px solid #DADCE0; padding-bottom: 4px; margin-top: 14px; margin-bottom: 8px; }
+        .markdown-cell h2 { font-size: 13pt; margin-top: 14px; margin-bottom: 8px; }
+        .markdown-cell h3 { font-size: 11.5pt; margin-top: 14px; margin-bottom: 8px; }
+        .code-cell {
+            border: 1px solid #DADCE0;
+            border-radius: 6px;
+            background-color: #F8F9FA;
+            overflow: hidden;
+            margin-bottom: 14px;
+            page-break-inside: auto;
+        }
+        .code-cell-header {
+            background-color: #F1F3F4;
+            color: #5F6368;
+            font-family: 'Fira Code', monospace;
+            font-size: 8.5pt;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-bottom: 1px solid #E8EAED;
+        }
+        .code-cell-input {
+            padding: 10px 14px;
+            background-color: #F8F9FA;
+            font-family: 'Fira Code', monospace;
+            font-size: 9pt;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .code-cell-input pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
+        .code-cell-output {
+            background-color: #FFFFFF;
+            border-top: 1px solid #DADCE0;
+            padding: 10px 14px;
+            font-family: 'Fira Code', monospace;
+            font-size: 8.5pt;
+        }
+        .output-stdout pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
+        .output-display-data img { max-width: 100%; border: 1px solid #DADCE0; border-radius: 4px; margin-top: 8px; }
+        .footer-container {
+            margin-top: 36px;
+            padding-top: 10px;
+            border-top: 1.5px solid #BDC1C6;
+            text-align: center;
+        }
+        .footer-text-block { font-size: 9pt; color: #5F6368; margin-bottom: 2px; }
+        .footer-link-badge { color: #1A73E8; font-weight: 700; text-decoration: none; font-size: 8.5pt; }
+
+        @media print {
+            body { padding: 0; }
+            .footer-container { position: fixed; bottom: 0; left: 0; right: 0; }
+        }
     </style>
 </head>
 <body>
@@ -470,12 +553,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.URL.revokeObjectURL(url);
                     showStatus('✅ PDF Downloaded Successfully!', 'green');
                 } else {
-                    // Fallback to browser print PDF on GitHub Pages static host
-                    showStatus('ℹ️ Hosting statis: Membuka dialog Cetak PDF browser...', 'green');
-                    const win = previewIframe.contentWindow;
-                    if (win) {
-                        win.focus();
-                        win.print();
+                    // Pure Client-Side PDF Generation for GitHub Pages using html2pdf
+                    showStatus('⏳ Generating PDF directly in browser (Client-side)...');
+                    const iframeDoc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+                    const element = iframeDoc.body;
+                    
+                    const fileName = (payload.title ? payload.title.replace(/[^a-z0-9]/gi, '_') : 'notebook') + '.pdf';
+                    
+                    const opt = {
+                        margin:       10,
+                        filename:     fileName,
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2, useCORS: true, logging: false },
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    if (window.html2pdf) {
+                        await window.html2pdf().set(opt).from(element).save();
+                        showStatus('✅ PDF Downloaded Successfully!', 'green');
+                    } else {
+                        // Fallback if script not loaded
+                        const win = previewIframe.contentWindow;
+                        if (win) {
+                            win.focus();
+                            win.print();
+                        }
                     }
                 }
             } catch (err) {
