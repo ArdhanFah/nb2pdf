@@ -29,5 +29,8 @@ echo ""
 echo "🚀 Starting Web Server on http://localhost:5000..."
 echo "========================================================"
 
+# Kill any previous server running on port 5000 to prevent Address already in use
+fuser -k 5000/tcp 2>/dev/null || pkill -f app.py 2>/dev/null || true
+
 # Run Web Server using venv python
 "$PYTHON_BIN" app.py "$@"

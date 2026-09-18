@@ -337,6 +337,72 @@ def extract_naked_tex(text: str, math_inlines: list, math_blocks: list) -> str:
     return '\n'.join(new_lines)
 
 
+def autolink_text(text: str) -> str:
+    """
+    Converts plain-text URLs (http:// or https://) in HTML or plain text into clickable <a> anchor tags.
+    Preserves existing <a> tags and HTML element attributes (e.g., src="http...", href="http...").
+    """
+    if not text:
+        return text
+
+    parts = re.split(r'(<[^>]+>)', text)
+    in_a_tag = False
+
+    for i in range(len(parts)):
+        part = parts[i]
+        if part.startswith('<'):
+            if re.match(r'<a\b', part, re.IGNORECASE):
+                in_a_tag = True
+            elif re.match(r'</a\s*>', part, re.IGNORECASE):
+                in_a_tag = False
+        else:
+            if not in_a_tag and part:
+                def repl(m):
+                    url = m.group(0)
+                    trailing = ""
+                    while url and url[-1] in '.,;:]!)':
+                        trailing = url[-1] + trailing
+                        url = url[:-1]
+                    return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>{trailing}'
+
+                parts[i] = re.sub(r'https?://[^\s<>"\'\)]+', repl, part)
+
+    return "".join(parts)
+
+
+def process_notebook_cells(cells, student_name: str = None, student_nim: str = None, student_class: str = None) -> list:
+    """Processes notebook cells, rendering markdown and autolinking raw URLs in code and outputs."""
+    processed_cells = []
+    for cell in cells:
+        cell_dict = {
+            "cell_type": cell.cell_type,
+            "source": cell.source,
+            "autolinked_source": autolink_text(html.escape(cell.source)),
+        }
+        if cell.cell_type == "markdown":
+            cell_dict["rendered_html"] = render_md(
+                cell.source,
+                student_name=student_name,
+                student_nim=student_nim,
+                student_class=student_class
+            )
+        elif cell.cell_type == "code":
+            formatted_outputs = []
+            for output in cell.get("outputs", []):
+                out_copy = dict(output)
+                if output.get("output_type") == "stream":
+                    out_copy["html_text"] = autolink_text(html.escape(output.get("text", "")))
+                elif output.get("output_type") in ["execute_result", "display_data"]:
+                    if "text/plain" in output.get("data", {}):
+                        out_copy["html_text"] = autolink_text(html.escape(output.get("data", {})["text/plain"]))
+                elif output.get("output_type") == "error":
+                    out_copy["html_evalue"] = autolink_text(html.escape(output.get("evalue", "")))
+                formatted_outputs.append(out_copy)
+            cell_dict["outputs"] = formatted_outputs
+        processed_cells.append(cell_dict)
+    return processed_cells
+
+
 def render_md(text, student_name: str = None, student_nim: str = None, student_class: str = None) -> str:
     """
     Renders markdown to HTML with TeX Math parsing and identity placeholder substitution.
@@ -401,6 +467,9 @@ def render_md(text, student_name: str = None, student_nim: str = None, student_c
         math_html = render_latex_to_html_img(formula, is_block=False)
         rendered = rendered.replace(f"MATHINLINEXYZ{i}XYZ", math_html)
 
+    # 5. Autolink raw URLs in text
+    rendered = autolink_text(rendered)
+
     return rendered
 
 
@@ -440,22 +509,12 @@ def convert(
         notebook_title = "Laporan Praktikum"
 
     # Process cells
-    processed_cells = []
-    for cell in nb.cells:
-        cell_dict = {
-            "cell_type": cell.cell_type,
-            "source": cell.source,
-        }
-        if cell.cell_type == "markdown":
-            cell_dict["rendered_html"] = render_md(
-                cell.source,
-                student_name=student_name,
-                student_nim=student_nim,
-                student_class=student_class
-            )
-        elif cell.cell_type == "code":
-            cell_dict["outputs"] = cell.get("outputs", [])
-        processed_cells.append(cell_dict)
+    processed_cells = process_notebook_cells(
+        nb.cells,
+        student_name=student_name,
+        student_nim=student_nim,
+        student_class=student_class
+    )
 
     # Load CSS content
     css_file = TEMPLATES_DIR / "neobrutalism.css"

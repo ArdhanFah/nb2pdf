@@ -88,22 +88,12 @@ class NeobrutalismRequestHandler(BaseHTTPRequestHandler):
             self._send_response(f"Error parsing notebook: {str(e)}", "text/plain", 400)
             return
 
-        processed_cells = []
-        for cell in nb.cells:
-            cell_dict = {
-                "cell_type": cell.cell_type,
-                "source": cell.source,
-            }
-            if cell.cell_type == "markdown":
-                cell_dict["rendered_html"] = converter.render_md(
-                    cell.source,
-                    student_name=student_name,
-                    student_nim=student_nim,
-                    student_class=student_class
-                )
-            elif cell.cell_type == "code":
-                cell_dict["outputs"] = cell.get("outputs", [])
-            processed_cells.append(cell_dict)
+        processed_cells = converter.process_notebook_cells(
+            nb.cells,
+            student_name=student_name,
+            student_nim=student_nim,
+            student_class=student_class
+        )
 
         css_file = converter.TEMPLATES_DIR / "neobrutalism.css"
         with open(css_file, "r", encoding="utf-8") as f:

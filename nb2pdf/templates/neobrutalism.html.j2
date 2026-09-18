@@ -60,12 +60,12 @@
                         <span>[CODE CELL #{{ loop.index }}]</span>
                         <span>PYTHON</span>
                     </div>
-                    <div class="code-cell-input"><pre><code>{{ cell.source }}</code></pre></div>
+                    <div class="code-cell-input"><pre><code>{{ cell.autolinked_source | default(cell.source) }}</code></pre></div>
                     {% if cell.outputs %}
                         <div class="code-cell-output">
                             {% for output in cell.outputs %}
                                 {% if output.output_type == 'stream' %}
-                                    <div class="output-{{ output.name }}"><pre>{{ output.text }}</pre></div>
+                                    <div class="output-{{ output.name }}"><pre>{{ output.html_text if output.html_text is defined else output.text }}</pre></div>
                                 {% elif output.output_type in ['execute_result', 'display_data'] %}
                                     {% if 'image/png' in output.data %}
                                         <div class="output-display-data">
@@ -80,11 +80,11 @@
                                             {{ output.data['text/html'] }}
                                         </div>
                                     {% elif 'text/plain' in output.data %}
-                                        <div class="output-stdout"><pre>{{ output.data['text/plain'] }}</pre></div>
+                                        <div class="output-stdout"><pre>{{ output.html_text if output.html_text is defined else output.data['text/plain'] }}</pre></div>
                                     {% endif %}
                                 {% elif output.output_type == 'error' %}
                                     <div class="output-stderr">
-                                        <pre>{{ output.ename }}: {{ output.evalue }}</pre>
+                                        <pre>{{ output.ename }}: {{ output.html_evalue if output.html_evalue is defined else output.evalue }}</pre>
                                     </div>
                                 {% endif %}
                             {% endfor %}

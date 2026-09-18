@@ -26,6 +26,8 @@ body {
     background-color: #F8F9FA;
     padding: 18px 24px;
     margin-bottom: 24px;
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
 
 .cover-title {
@@ -82,7 +84,8 @@ body {
 /* Cell Wrapper */
 .cell {
     margin-bottom: 16px;
-    page-break-inside: avoid;
+    page-break-inside: auto;
+    break-inside: auto;
 }
 
 /* Markdown Cells */
@@ -90,6 +93,8 @@ body {
     background-color: #FFFFFF;
     padding: 6px 0;
     color: #202124;
+    page-break-inside: auto;
+    break-inside: auto;
 }
 
 .markdown-cell h1, .markdown-cell h2, .markdown-cell h3, .markdown-cell h4 {
@@ -97,6 +102,8 @@ body {
     font-weight: 700;
     margin-top: 14px;
     margin-bottom: 8px;
+    page-break-after: avoid;
+    break-after: avoid;
 }
 
 .markdown-cell h1 {
@@ -167,6 +174,8 @@ math[display="block"] {
     background-color: #F8F9FA;
     overflow: hidden;
     margin-bottom: 14px;
+    page-break-inside: auto;
+    break-inside: auto;
 }
 
 .code-cell-header {
@@ -179,6 +188,8 @@ math[display="block"] {
     border-bottom: 1px solid #E8EAED;
     display: flex;
     justify-content: space-between;
+    page-break-after: avoid;
+    break-after: avoid;
 }
 
 .code-cell-input {
@@ -190,10 +201,22 @@ math[display="block"] {
     line-height: 1.5;
     white-space: pre-wrap;
     word-break: break-all;
+    page-break-inside: auto;
+    break-inside: auto;
 }
 
 .code-cell-input code {
     font-family: 'Fira Code', 'Courier New', monospace;
+}
+
+pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+    page-break-inside: auto;
+    break-inside: auto;
+    orphans: 2;
+    widows: 2;
 }
 
 /* Code Output */
@@ -204,12 +227,16 @@ math[display="block"] {
     font-family: 'Fira Code', 'Courier New', monospace;
     font-size: 8.5pt;
     color: #3C4043;
+    page-break-inside: auto;
+    break-inside: auto;
 }
 
 .output-stdout, .output-stderr {
     white-space: pre-wrap;
     word-break: break-all;
     font-family: 'Fira Code', monospace;
+    page-break-inside: auto;
+    break-inside: auto;
 }
 
 .output-stderr {
@@ -221,10 +248,13 @@ math[display="block"] {
 
 .output-display-data img {
     max-width: 100%;
+    max-height: 220mm;
     height: auto;
     border: 1px solid #DADCE0;
     border-radius: 4px;
     margin-top: 8px;
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
 
 /* Tables in Colab Style */
@@ -235,6 +265,13 @@ table {
     border: 1px solid #DADCE0;
     border-radius: 4px;
     overflow: hidden;
+    page-break-inside: auto;
+    break-inside: auto;
+}
+
+tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
 
 th {
@@ -270,12 +307,14 @@ blockquote {
 
 /* Links */
 a {
-    color: #202124;
+    color: #1A73E8;
     font-weight: 500;
     text-decoration: underline;
+    word-break: break-all;
 }
 
 a:hover {
+    color: #1557B0;
     text-decoration: underline;
 }
 
